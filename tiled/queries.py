@@ -336,7 +336,10 @@ class In:
     value: List[JSONSerializable]
 
     def __post_init__(self):
-        self.value = list(self.value)
+        if isinstance(self.value, str):
+            self.value = [self.value]
+        else:
+            self.value = list(self.value)
 
     def encode(self):
         return {"key": self.key, "value": json.dumps(self.value)}
@@ -371,7 +374,10 @@ class NotIn:
     value: List[JSONSerializable]
 
     def __post_init__(self):
-        self.value = list(self.value)
+        if isinstance(self.value, str):
+            self.value = [self.value]
+        else:
+            self.value = list(self.value)
 
     def encode(self):
         return {"key": self.key, "value": json.dumps(self.value)}
@@ -407,13 +413,14 @@ class Specs:
         exclude = exclude or []
 
         if isinstance(include, str):
-            raise TypeError("include must be a list not a str")
+            self.include = [include]
+        else:
+            self.include = list(include)
 
         if isinstance(exclude, str):
-            raise TypeError("exclude must be a list not a str")
-
-        self.include = list(include)
-        self.exclude = list(exclude)
+            self.exclude = [exclude]
+        else:
+            self.exclude = list(exclude)
 
     def encode(self):
         return {
