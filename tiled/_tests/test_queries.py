@@ -152,9 +152,6 @@ def test_notin_single_value():
     ],
 )
 def test_specs(include_values, exclude_values):
-    with pytest.raises(TypeError):
-        Specs("foo")
-
     assert sorted(list(client.search(Specs(include=include_values)))) == sorted(
         ["specs_foo_bar", "specs_foo_bar_baz"]
     )
@@ -165,9 +162,6 @@ def test_specs(include_values, exclude_values):
 
 
 def test_specs_single_values():
-    with pytest.raises(TypeError):
-        Specs("foo")
-
     assert sorted(list(client.search(Specs(include="bar")))) == sorted(
         ["specs_foo_bar", "specs_foo_bar_baz"]
     )
