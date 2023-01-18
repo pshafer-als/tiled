@@ -117,6 +117,11 @@ def test_in(query_values):
     assert sorted(list(client.search(In("letter", query_values)))) == ["a", "k", "z"]
 
 
+def test_in_string_value():
+    with pytest.raises(TypeError):
+        In("letter", "string-not-list")
+
+
 @pytest.mark.parametrize(
     "query_values",
     [
@@ -130,6 +135,11 @@ def test_notin(query_values):
     assert sorted(list(client.search(NotIn("letter", query_values)))) == sorted(
         list(set(keys) - set(["a", "k", "z"]))
     )
+
+
+def test_not_in_string_value():
+    with pytest.raises(TypeError):
+        NotIn("letter", "string-not-list")
 
 
 @pytest.mark.parametrize(

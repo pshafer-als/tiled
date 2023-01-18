@@ -336,6 +336,9 @@ class In:
     value: List[JSONSerializable]
 
     def __post_init__(self):
+        if isinstance(self.value, str):
+            raise TypeError("value must be a list not a str")
+
         self.value = list(self.value)
 
     def encode(self):
@@ -371,6 +374,9 @@ class NotIn:
     value: List[JSONSerializable]
 
     def __post_init__(self):
+        if isinstance(self.value, str):
+            raise TypeError("value must be a list not a str")
+
         self.value = list(self.value)
 
     def encode(self):
