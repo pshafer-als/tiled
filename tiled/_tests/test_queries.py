@@ -111,6 +111,7 @@ def test_not_and_and_or():
         ("a", "k", "z"),
         {"a", "k", "z"},
         {"a", "k", "z", "a", "z", "z"},
+        "akz",
     ],
 )
 def test_in(query_values):
@@ -124,6 +125,7 @@ def test_in(query_values):
         ("a", "k", "z"),
         {"a", "k", "z"},
         {"a", "k", "z", "a", "z", "z"},
+        "akz",
     ],
 )
 def test_notin(query_values):
