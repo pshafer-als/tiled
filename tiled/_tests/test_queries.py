@@ -20,12 +20,12 @@ from ..queries import (
     StructureFamily,
 )
 
-keys = list(string.ascii_lowercase)
+keys = list(string.ascii_lowercase) + ["Zzz"]
 mapping = {
     letter: ArrayAdapter.from_array(
         number * numpy.ones(10), metadata={"letter": letter, "number": number}
     )
-    for letter, number in zip(keys, range(26))
+    for letter, number in zip(keys, range(len(keys)))
 }
 mapping["does_contain_z"] = ArrayAdapter.from_array(
     numpy.ones(10), metadata={"letters": list(string.ascii_lowercase)}
@@ -69,8 +69,8 @@ def test_noteq():
 
 
 def test_comparison():
-    assert list(client.search(Comparison("gt", "number", 24))) == ["z"]
-    assert list(client.search(Comparison("ge", "number", 24))) == ["y", "z"]
+    assert list(client.search(Comparison("gt", "number", 24))) == ["z", "Zzz"]
+    assert list(client.search(Comparison("ge", "number", 24))) == ["y", "z", "Zzz"]
     assert list(client.search(Comparison("lt", "number", 1))) == ["a"]
     assert list(client.search(Comparison("le", "number", 1))) == ["a", "b"]
 
@@ -117,6 +117,10 @@ def test_in(query_values):
     assert sorted(list(client.search(In("letter", query_values)))) == ["a", "k", "z"]
 
 
+def test_in_single_value():
+    assert list(client.search(In("letter", "Zzz"))) == ["Zzz"]
+
+
 @pytest.mark.parametrize(
     "query_values",
     [
@@ -129,6 +133,12 @@ def test_in(query_values):
 def test_notin(query_values):
     assert sorted(list(client.search(NotIn("letter", query_values)))) == sorted(
         list(set(keys) - set(["a", "k", "z"]))
+    )
+
+
+def test_notin_single_value():
+    assert sorted(list(client.search(NotIn("letter", "Zzz")))) == sorted(
+        list(set(keys) - set(["Zzz"]))
     )
 
 
@@ -150,6 +160,19 @@ def test_specs(include_values, exclude_values):
     )
 
     assert list(client.search(Specs(include=include_values, exclude=exclude_values))) == [
+        "specs_foo_bar"
+    ]
+
+
+def test_specs_single_values():
+    with pytest.raises(TypeError):
+        Specs("foo")
+
+    assert sorted(list(client.search(Specs(include="bar")))) == sorted(
+        ["specs_foo_bar", "specs_foo_bar_baz"]
+    )
+
+    assert list(client.search(Specs(include="bar", exclude="baz"))) == [
         "specs_foo_bar"
     ]
 
