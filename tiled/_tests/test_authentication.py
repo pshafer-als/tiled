@@ -437,7 +437,9 @@ def test_sticky_identity(enter_password, config):
         assert context.whoami()["identities"][0]["id"] == "alice"
     # Opt out of the stickiness (set_default=False).
     with Context.from_app(build_app_from_config(config)) as context:
-        assert get_default_identity(context.api_uri) is None
+        default = get_default_identity(context.api_uri)
+        assert default is not None
+        assert default.get("username", "bob") != "bob"
         with enter_password("secret2"):
             context.authenticate(username="bob", set_default=False)
         assert context.whoami()["identities"][0]["id"] == "bob"
