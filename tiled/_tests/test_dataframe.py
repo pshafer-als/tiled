@@ -182,24 +182,22 @@ def test_deprecated_query_parameter(context):
         context.http_client.get(url_path, params=params)
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_redundant_query_parameters(context):
     "HTTP route /table/partition accepts 'column' or 'field', but not both"
     client = from_context(context)
     url_path = client["basic"].item["links"]["partition"]
     original_params = {
         "partition": 0,
-        "field": "x",
+        "field": "x",  # Parameter is deprecated, but central to this test
         "column": "y",
     }
 
     # It is OK to include query parameter 'column' OR 'field'
-    params = original_params.copy()
-    params.pop("column")
-    with pytest.warns(DeprecationWarning):
+    for param in ("field", "column"):
+        params = original_params.copy()
+        params.pop(param)
         context.http_client.get(url_path, params=params).raise_for_status()
-    params = original_params.copy()
-    params.pop("field")
-    context.http_client.get(url_path, params=params).raise_for_status()
 
     # It is an error to include query parameter 'column' AND 'field'
     with fail_with_status_code(400) as response:
